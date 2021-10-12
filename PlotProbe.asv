@@ -22,7 +22,7 @@ function varargout = PlotProbe(varargin)
 
 % Edit the above text to modify the response to help PlotProbe
 
-% Last Modified by GUIDE v2.5 11-Oct-2021 15:39:16
+% Last Modified by GUIDE v2.5 12-Oct-2021 12:31:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,7 +81,7 @@ end
 guidata(hObject, handles);
 
 % UIWAIT makes PlotProbe wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.mainFigure);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -100,7 +100,8 @@ function probeAxes_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to probeAxes (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.currentPoint = get(hObject,'CurrentPoint');
+%handles.currentPoint = get(hObject,'CurrentPoint');
+disp(get(eventdata.Source,'Tag'))
 
 
 % --------------------------------------------------------------------
@@ -133,8 +134,8 @@ guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function figure1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to figure1 (see GCBO)
+function mainFigure_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mainFigure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -215,6 +216,15 @@ lstKeep1b = find(rhoHRF>=rhoMin & rhoHRF<=rhoMax & mlHRF(:,3)==1 & mlHRF(:,4)==2
 lstKeep2b = find(rhoHRF>=rhoMin & rhoHRF<=rhoMax & mlHRF(:,3)==2 & mlHRF(:,4)==2 );
 lstKeep3b = find(rhoHRF>=rhoMin & rhoHRF<=rhoMax & mlHRF(:,3)==3 & mlHRF(:,4)==2 );
 
+listas=cell(3,2);
+listas{1,1}=lstKeep1a;
+listas{2,1}=lstKeep2a;
+listas{3,1}=lstKeep3a;
+listas{1,2}=lstKeep1b;
+listas{2,2}=lstKeep2b;
+listas{3,2}=lstKeep3b;
+
+
 % d1 = dAvg(:,lstKeep1);
 % d2 = dAvg(:,lstKeep2);
 % d3 = dAvg(:,lstKeep3);
@@ -226,15 +236,17 @@ d3a = dAvg(:,lstKeep3a);
 d1b = dAvg(:,lstKeep1b);
 d2b = dAvg(:,lstKeep2b);
 d3b = dAvg(:,lstKeep3b);
-
-axes(fig)
-hp=plot( probe.sourcePos2D(mlHRF(lstKeep1,1),1), probe.sourcePos2D(mlHRF(lstKeep1,1),2), 'r.' );
+ax=fig;
+fooF=get(handles.probeAxes,'ButtonDownFcn');
+hp=plot(ax, probe.sourcePos2D(mlHRF(lstKeep1,1),1), probe.sourcePos2D(mlHRF(lstKeep1,1),2), 'r.' );
 set(hp,'color',[1 0.5 0.5])
 set(hp,'markersize',8)
+set(hp,'ButtonDownFcn',fooF);
 hold on
-hp=plot( probe.detectorPos2D(mlHRF(lstKeep1,2),1), probe.detectorPos2D(mlHRF(lstKeep1,2),2), 'b.' );
+hp=plot(ax, probe.detectorPos2D(mlHRF(lstKeep1,2),1), probe.detectorPos2D(mlHRF(lstKeep1,2),2), 'b.' );
 set(hp,'color',[0.5 0.5 1])
 set(hp,'markersize',8)
+set(hp,'ButtonDownFcn',fooF);
 %plot( pCH(lstKeep1,1), pCH(lstKeep1,2), 'go' )
 
 xx = ((tHRF - min(tHRF)) / (max(tHRF) - min(tHRF)) - 0.5) * 0.05;
@@ -248,66 +260,77 @@ if 0
     yy1 = ((yy(:,:,1)) / (maxyy-minyy)) * 0.05;
     yy2 = ((yy(:,:,2)) / (maxyy-minyy)) * 0.05;
     yy3 = ((yy(:,:,3)) / (maxyy-minyy)) * 0.05;
-    
+    %wavelength A
     for iM = 1:length(lstKeep1)
-        h=plot( xx+pCH(lstKeep1(iM),1), yy1(:,iM)+pCH(lstKeep1(iM),2), 'r-');
-         set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep1(iM),1), yy1(:,iM)+pCH(lstKeep1(iM),2), 'r-');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list1->',num2str(iM),'O']);
     end
     for iM = 1:length(lstKeep2)
-        plot( xx+pCH(lstKeep2(iM),1), yy2(:,iM)+pCH(lstKeep2(iM),2), 'b-')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep2(iM),1), yy2(:,iM)+pCH(lstKeep2(iM),2), 'b-');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list2->',num2str(iM),'O']);
     end
     for iM = 1:length(lstKeep3)
-        plot( xx+pCH(lstKeep3(iM),1), yy3(:,iM)+pCH(lstKeep3(iM),2), 'c-')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep3(iM),1), yy3(:,iM)+pCH(lstKeep3(iM),2), 'c-');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list3->',num2str(iM),'O']);
     end
     
 else
+    %wavelength B
     minyy = min(min(d1a));
     maxyy = max(max(d1a));
     yy1 = ((d1a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep1a)
-        plot( xx+pCH(lstKeep1a(iM),1), yy1(:,iM)+pCH(lstKeep1a(iM),2), 'r-.')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep1a(iM),1), yy1(:,iM)+pCH(lstKeep1a(iM),2), 'r-.');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list1->',num2str(iM),'W']);
     end
 
     minyy = min(min(d1b));
     maxyy = max(max(d1b));
     yy1 = ((d1b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep1b)
-        plot( xx+pCH(lstKeep1b(iM),1), yy1(:,iM)+pCH(lstKeep1b(iM),2), 'r-')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep1b(iM),1), yy1(:,iM)+pCH(lstKeep1b(iM),2), 'r-');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list1->',num2str(iM),'B']);
     end
     
     minyy = min(min(d2a));
     maxyy = max(max(d2a));
     yy1 = ((d2a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep2a)
-        plot( xx+pCH(lstKeep2a(iM),1), yy1(:,iM)+pCH(lstKeep2a(iM),2), 'b-.')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep2a(iM),1), yy1(:,iM)+pCH(lstKeep2a(iM),2), 'b-.');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list2->',num2str(iM),'A']);
     end
 
     minyy = min(min(d2b));
     maxyy = max(max(d2b));
     yy1 = ((d2b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep2b)
-        plot( xx+pCH(lstKeep2b(iM),1), yy1(:,iM)+pCH(lstKeep2b(iM),2), 'b-')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep2b(iM),1), yy1(:,iM)+pCH(lstKeep2b(iM),2), 'b-');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list2->',num2str(iM),'B']);
     end
     
     minyy = min(min(d3a));
     maxyy = max(max(d3a));
     yy1 = ((d3a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep3a)
-        plot( xx+pCH(lstKeep3a(iM),1), yy1(:,iM)+pCH(lstKeep3a(iM),2), 'c-.')
-        set(h,'ButtonDownFcn',get(probeAxes,'ButtonDownFcn'));
+        h=plot(ax, xx+pCH(lstKeep3a(iM),1), yy1(:,iM)+pCH(lstKeep3a(iM),2), 'c-.');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list3->',num2str(iM),'A']);
     end
 
     minyy = min(min(d3b));
     maxyy = max(max(d3b));
     yy1 = ((d3b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep3b)
-        plot( xx+pCH(lstKeep3b(iM),1), yy1(:,iM)+pCH(lstKeep3b(iM),2), 'c-')
+        h=plot(ax, xx+pCH(lstKeep3b(iM),1), yy1(:,iM)+pCH(lstKeep3b(iM),2), 'c-');
+        set(h,'ButtonDownFcn',fooF);
+        set(h,'Tag',['list3->',num2str(iM),'B']);
     end
 end
 
@@ -375,3 +398,35 @@ function debug_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 disp('debug!')
+
+
+% --- Executes during object creation, after setting all properties.
+function axes3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate axes3
+
+
+% --- Executes on mouse press over axes background.
+function axes3_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to axes3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes during object creation, after setting all properties.
+function probeAxes_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to probeAxes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate probeAxes
+
+
+% --- Executes during object deletion, before destroying properties.
+function probeAxes_DeleteFcn(hObject, eventdata, handles)
+% hObject    handle to probeAxes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
