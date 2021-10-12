@@ -250,13 +250,16 @@ if 0
     yy3 = ((yy(:,:,3)) / (maxyy-minyy)) * 0.05;
     
     for iM = 1:length(lstKeep1)
-        plot( xx+pCH(lstKeep1(iM),1), yy1(:,iM)+pCH(lstKeep1(iM),2), 'r-')
+        h=plot( xx+pCH(lstKeep1(iM),1), yy1(:,iM)+pCH(lstKeep1(iM),2), 'r-');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
     for iM = 1:length(lstKeep2)
-        plot( xx+pCH(lstKeep2(iM),1), yy2(:,iM)+pCH(lstKeep2(iM),2), 'b-')
+        h=plot( xx+pCH(lstKeep2(iM),1), yy2(:,iM)+pCH(lstKeep2(iM),2), 'b-');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
     for iM = 1:length(lstKeep3)
-        plot( xx+pCH(lstKeep3(iM),1), yy3(:,iM)+pCH(lstKeep3(iM),2), 'c-')
+        h=plot( xx+pCH(lstKeep3(iM),1), yy3(:,iM)+pCH(lstKeep3(iM),2), 'c-');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
     
 else
@@ -264,42 +267,48 @@ else
     maxyy = max(max(d1a));
     yy1 = ((d1a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep1a)
-        plot( xx+pCH(lstKeep1a(iM),1), yy1(:,iM)+pCH(lstKeep1a(iM),2), 'r-.')
+        h=plot( xx+pCH(lstKeep1a(iM),1), yy1(:,iM)+pCH(lstKeep1a(iM),2), 'r-.');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
 
     minyy = min(min(d1b));
     maxyy = max(max(d1b));
     yy1 = ((d1b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep1b)
-        plot( xx+pCH(lstKeep1b(iM),1), yy1(:,iM)+pCH(lstKeep1b(iM),2), 'r-')
+        h=plot( xx+pCH(lstKeep1b(iM),1), yy1(:,iM)+pCH(lstKeep1b(iM),2), 'r-');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
     
     minyy = min(min(d2a));
     maxyy = max(max(d2a));
     yy1 = ((d2a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep2a)
-        plot( xx+pCH(lstKeep2a(iM),1), yy1(:,iM)+pCH(lstKeep2a(iM),2), 'b-.')
+        h=plot( xx+pCH(lstKeep2a(iM),1), yy1(:,iM)+pCH(lstKeep2a(iM),2), 'b-.');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
 
     minyy = min(min(d2b));
     maxyy = max(max(d2b));
     yy1 = ((d2b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep2b)
-        plot( xx+pCH(lstKeep2b(iM),1), yy1(:,iM)+pCH(lstKeep2b(iM),2), 'b-')
+        h=plot( xx+pCH(lstKeep2b(iM),1), yy1(:,iM)+pCH(lstKeep2b(iM),2), 'b-');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
     
     minyy = min(min(d3a));
     maxyy = max(max(d3a));
     yy1 = ((d3a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep3a)
-        plot( xx+pCH(lstKeep3a(iM),1), yy1(:,iM)+pCH(lstKeep3a(iM),2), 'c-.')
+        h=plot( xx+pCH(lstKeep3a(iM),1), yy1(:,iM)+pCH(lstKeep3a(iM),2), 'c-.');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
 
     minyy = min(min(d3b));
     maxyy = max(max(d3b));
     yy1 = ((d3b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep3b)
-        plot( xx+pCH(lstKeep3b(iM),1), yy1(:,iM)+pCH(lstKeep3b(iM),2), 'c-')
+        h=plot( xx+pCH(lstKeep3b(iM),1), yy1(:,iM)+pCH(lstKeep3b(iM),2), 'c-');
+        set(h,'ButtonDownFcn',get(handles.probeAxes,'ButtonDownFcn'));
     end
 end
 
