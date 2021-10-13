@@ -101,8 +101,31 @@ function probeAxes_ButtonDownFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %handles.currentPoint = get(hObject,'CurrentPoint');
-disp(get(eventdata.Source,'Tag'))
-handles.listas
+
+%find the other related curves
+
+%Identify curve parameters
+chanNum=str2num(get(eventdata.Source,'Tag')); %#ok<ST2NM>
+wavelengthIndex=handles.data.timeSeries.measurementList(chanNum).wavelengthIndex;
+dataTypeIndex=handles.data.timeSeries.measurementList(chanNum).dataTypeIndex;
+sourceIndex=handles.data.timeSeries.measurementList(chanNum).sourceIndex;
+detectorIndex=handles.data.timeSeries.measurementList(chanNum).detectorIndex;
+rho=norm(handles.data.probe.sourcePos3D(sourceIndex,:)-handles.data.probe.detectorPos3D(detectorIndex,:));
+
+
+%plot
+figure
+plot(handles.data.timeSeries.time,handles.data.timeSeries.dataTimeSeries(:,chanNum))
+xlabel('Time [s]')
+ytags={'Intensity','m1','V'};
+ylabel([ytags{handles.data.probe.momentOrders(dataTypeIndex)+1},...
+    '\lambda_',num2str(wavelengthIndex),...
+    ' \rho=',num2str(rho)])
+title(['Source ', num2str(sourceIndex),...
+    '. Detector ',num2str(detectorIndex),...
+    '.']);
+    
+
 
 % --------------------------------------------------------------------
 function fileTag_Callback(hObject, eventdata, handles)
@@ -140,7 +163,6 @@ function mainFigure_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 function plotData(hObject,handles)
-
 probe= handles.data.probe;
 yavg=handles.data.averages;
 rhoRange=[str2double(handles.loLimrho.String) str2double(handles.hiLimrho.String)];
@@ -216,18 +238,6 @@ lstKeep1b = find(rhoHRF>=rhoMin & rhoHRF<=rhoMax & mlHRF(:,3)==1 & mlHRF(:,4)==2
 lstKeep2b = find(rhoHRF>=rhoMin & rhoHRF<=rhoMax & mlHRF(:,3)==2 & mlHRF(:,4)==2 );
 lstKeep3b = find(rhoHRF>=rhoMin & rhoHRF<=rhoMax & mlHRF(:,3)==3 & mlHRF(:,4)==2 );
 
-listas=cell(3,2);
-listas{1,1}=lstKeep1a;
-listas{2,1}=lstKeep2a;
-listas{3,1}=lstKeep3a;
-listas{1,2}=lstKeep1b;
-listas{2,2}=lstKeep2b;
-listas{3,2}=lstKeep3b;
-
-handles.listas=listas;
-guidata(hObject, handles);
-
-
 % d1 = dAvg(:,lstKeep1);
 % d2 = dAvg(:,lstKeep2);
 % d3 = dAvg(:,lstKeep3);
@@ -262,33 +272,31 @@ if 0
     maxyy = max(yy(:));
     yy1 = ((yy(:,:,1)) / (maxyy-minyy)) * 0.05;
     yy2 = ((yy(:,:,2)) / (maxyy-minyy)) * 0.05;
-    yy3 = ((yy(:,:,3)) / (maxyy-minyy)) * 0.05;
-    %wavelength A
+    yy3 = ((yy(:,:,3)) / (maxyy-minyy)) * 0.05;    
     for iM = 1:length(lstKeep1)
         h=plot(ax, xx+pCH(lstKeep1(iM),1), yy1(:,iM)+pCH(lstKeep1(iM),2), 'r-');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list1->',num2str(iM),'O']);
+        set(h,'Tag',num2str(lstKeep1(iM)));
     end
     for iM = 1:length(lstKeep2)
         h=plot(ax, xx+pCH(lstKeep2(iM),1), yy2(:,iM)+pCH(lstKeep2(iM),2), 'b-');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list2->',num2str(iM),'O']);
+        set(h,'Tag',num2str(lstKeep2(iM)));
     end
     for iM = 1:length(lstKeep3)
         h=plot(ax, xx+pCH(lstKeep3(iM),1), yy3(:,iM)+pCH(lstKeep3(iM),2), 'c-');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list3->',num2str(iM),'O']);
+        set(h,'Tag',num2str(lstKeep3(iM)));
     end
     
-else
-    %wavelength B
+else    
     minyy = min(min(d1a));
     maxyy = max(max(d1a));
     yy1 = ((d1a) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep1a)
         h=plot(ax, xx+pCH(lstKeep1a(iM),1), yy1(:,iM)+pCH(lstKeep1a(iM),2), 'r-.');
-        set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list1->',num2str(iM),'W']);
+        set(h,'ButtonDownFcn',fooF);        
+        set(h,'Tag',num2str(lstKeep1a(iM)));
     end
 
     minyy = min(min(d1b));
@@ -296,8 +304,8 @@ else
     yy1 = ((d1b) / (maxyy-minyy)) * 0.05;
     for iM = 1:length(lstKeep1b)
         h=plot(ax, xx+pCH(lstKeep1b(iM),1), yy1(:,iM)+pCH(lstKeep1b(iM),2), 'r-');
-        set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list1->',num2str(iM),'B']);
+        set(h,'ButtonDownFcn',fooF);                        
+        set(h,'Tag',num2str(lstKeep1b(iM)));
     end
     
     minyy = min(min(d2a));
@@ -306,7 +314,7 @@ else
     for iM = 1:length(lstKeep2a)
         h=plot(ax, xx+pCH(lstKeep2a(iM),1), yy1(:,iM)+pCH(lstKeep2a(iM),2), 'b-.');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list2->',num2str(iM),'A']);
+        set(h,'Tag',num2str(lstKeep2a(iM)));
     end
 
     minyy = min(min(d2b));
@@ -315,7 +323,7 @@ else
     for iM = 1:length(lstKeep2b)
         h=plot(ax, xx+pCH(lstKeep2b(iM),1), yy1(:,iM)+pCH(lstKeep2b(iM),2), 'b-');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list2->',num2str(iM),'B']);
+        set(h,'Tag',num2str(lstKeep2b(iM)));
     end
     
     minyy = min(min(d3a));
@@ -324,7 +332,7 @@ else
     for iM = 1:length(lstKeep3a)
         h=plot(ax, xx+pCH(lstKeep3a(iM),1), yy1(:,iM)+pCH(lstKeep3a(iM),2), 'c-.');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list3->',num2str(iM),'A']);
+        set(h,'Tag',num2str(lstKeep3a(iM)));
     end
 
     minyy = min(min(d3b));
@@ -333,7 +341,7 @@ else
     for iM = 1:length(lstKeep3b)
         h=plot(ax, xx+pCH(lstKeep3b(iM),1), yy1(:,iM)+pCH(lstKeep3b(iM),2), 'c-');
         set(h,'ButtonDownFcn',fooF);
-        set(h,'Tag',['list3->',num2str(iM),'B']);
+        set(h,'Tag',num2str(lstKeep3b(iM)));
     end
 end
 
