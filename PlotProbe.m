@@ -51,7 +51,7 @@ function PlotProbe_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to PlotProbe (see VARARGIN)
-debugFlag=0;
+debugFlag=1;
 
 handles.debugFlag=debugFlag;
 if debugFlag
@@ -64,11 +64,11 @@ if debugFlag
     datos.stims=stims;
     tt=datos.timeSeries.time;
     datos.onsets=zeros(size(tt));  %stimulus onsets
-    datos.s1=zeros(size(tt)); %full stims
+    datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
     for ki=1:size(stims.data,1)
-        sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));
-        datos.s1(sIdx)=stims.data(ki,3);
+        sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));        
         datos.onsets(sIdx(1))=1;
+        datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
     end
 else
     if ~isempty(varargin)
@@ -165,6 +165,9 @@ switch handles.seriesSelector.SelectedObject.String
                         end
                         if handles.dispStims.Value
                             plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
+                            Ys=[zeros(2,size(handles.data.s1,2))+offset;...
+                                scaling*ones(2,size(handles.data.s1,2))]; 
+                            patch(handles.data.s1,Ys,[1,.6,.6])
                         end
                         if handles.al2.Value
                             yyaxis right
@@ -184,6 +187,10 @@ switch handles.seriesSelector.SelectedObject.String
                         end
                         if handles.dispStims.Value
                             plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
+                            Ys=[zeros(2,size(handles.data.s1,2))+offset;...
+                                scaling*ones(2,size(handles.data.s1,2))]; 
+                            surface1=patch(handles.data.s1,Ys,[1,.6,.6]);
+                            %surface1.FaceVertexAlphaData=0.1;
                         end
                         hold off
                         if handles.ml2.Value
@@ -204,6 +211,9 @@ switch handles.seriesSelector.SelectedObject.String
                         end
                         if handles.dispStims.Value
                             plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
+                            Ys=[zeros(2,size(handles.data.s1,2))+offset;...
+                                scaling*ones(2,size(handles.data.s1,2))]; 
+                            patch(handles.data.s1,Ys,[1,.6,.6])
                         end
                         hold off
                         if handles.vl2.Value
@@ -262,11 +272,11 @@ if ~isempty(fName)
     datos.stims=stims;
     tt=datos.timeSeries.time;
     datos.onsets=zeros(size(tt));  %stimulus onsets
-    datos.s1=zeros(size(tt)); %full stims
+    datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
     for ki=1:size(stims.data,1)
-        sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));
-        datos.s1(sIdx)=stims.data(ki,3);
+        sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));        
         datos.onsets(sIdx(1))=1;
+        datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
     end
     handles.data=datos;
     %if data is present, send to axis to plot
