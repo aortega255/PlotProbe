@@ -479,6 +479,7 @@ else
         set(h,'Tag',num2str(lstKeep3b(iM)));
     end
 end
+axis(ax,'image')
 
 % Update handles structure
 guidata(hObject, handles);
