@@ -125,7 +125,9 @@ rho=norm(handles.data.probe.sourcePos3D(sourceIndex,:)-handles.data.probe.detect
 %figure out which time series I'm plotting
 
 %find the other related curves
-firstChan=chanNum-3*(wavelengthIndex-1)-dataTypeIndex+2; %%<-THIS ALGORITHM IS WRONG
+indice2=[1,0,2];
+currchanIdx=3*double(wavelengthIndex-1)+indice2(dataTypeIndex);
+firstChan=chanNum-currchanIdx;
 relatedChans=firstChan:firstChan+5;
 
 activePlots=[handles.al1.Value||handles.al2.Value,...
