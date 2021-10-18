@@ -296,6 +296,11 @@ function mainFigure_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
+function outputData=conditionData(inputData)
+%this function will be used either to process the data received either from
+%the load function or as the passed argument
+outputData=inputData;
+
 function plotData(hObject,handles)
 probe= handles.data.probe;
 yavg=handles.data.averages;
