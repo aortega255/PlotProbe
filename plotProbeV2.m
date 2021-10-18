@@ -1,35 +1,35 @@
-function varargout = PlotProbe(varargin)
-% PLOTPROBE MATLAB code for PlotProbe.fig
-%      PLOTPROBE, by itself, creates a new PLOTPROBE or raises the existing
+function varargout = plotProbeV2(varargin)
+% PLOTPROBEV2 MATLAB code for plotProbeV2.fig
+%      PLOTPROBEV2, by itself, creates a new PLOTPROBEV2 or raises the existing
 %      singleton*.
 %
-%      H = PLOTPROBE returns the handle to a new PLOTPROBE or the handle to
+%      H = PLOTPROBEV2 returns the handle to a new PLOTPROBEV2 or the handle to
 %      the existing singleton*.
 %
-%      PLOTPROBE('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in PLOTPROBE.M with the given input arguments.
+%      PLOTPROBEV2('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in PLOTPROBEV2.M with the given input arguments.
 %
-%      PLOTPROBE('Property','Value',...) creates a new PLOTPROBE or raises the
+%      PLOTPROBEV2('Property','Value',...) creates a new PLOTPROBEV2 or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before PlotProbe_OpeningFcn gets called.  An
+%      applied to the GUI before plotProbeV2_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to PlotProbe_OpeningFcn via varargin.
+%      stop.  All inputs are passed to plotProbeV2_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help PlotProbe
+% Edit the above text to modify the response to help plotProbeV2
 
-% Last Modified by GUIDE v2.5 13-Oct-2021 22:10:47
+% Last Modified by GUIDE v2.5 18-Oct-2021 10:47:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
     'gui_Singleton',  gui_Singleton, ...
-    'gui_OpeningFcn', @PlotProbe_OpeningFcn, ...
-    'gui_OutputFcn',  @PlotProbe_OutputFcn, ...
+    'gui_OpeningFcn', @plotProbeV2_OpeningFcn, ...
+    'gui_OutputFcn',  @plotProbeV2_OutputFcn, ...
     'gui_LayoutFcn',  [] , ...
     'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,13 +44,13 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before PlotProbe is made visible.
-function PlotProbe_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before plotProbeV2 is made visible.
+function plotProbeV2_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to PlotProbe (see VARARGIN)
+% varargin   command line arguments to plotProbeV2 (see VARARGIN)
 debugFlag=1;
 
 handles.debugFlag=debugFlag;
@@ -82,7 +82,7 @@ if exist('datos','var')
         plotData(hObject,handles);
     end
 end
-% Choose default command line output for PlotProbe
+% Choose default command line output for plotProbeV2
 handles.output = hObject;
 
 
@@ -91,12 +91,12 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes PlotProbe wait for user response (see UIRESUME)
+% UIWAIT makes plotProbeV2 wait for user response (see UIRESUME)
 % uiwait(handles.mainFigure);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = PlotProbe_OutputFcn(hObject, eventdata, handles)
+function varargout = plotProbeV2_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -301,7 +301,7 @@ probe= handles.data.probe;
 yavg=handles.data.averages;
 rhoRange=[str2double(handles.loLimrho.String) str2double(handles.hiLimrho.String)];
 fig =handles.probeAxes;
-buttonPressFuncHandle=@(hObject,eventdata)PlotProbe('probeAxes_ButtonDownFcn',hObject,eventdata,guidata(hObject));
+buttonPressFuncHandle=@(hObject,eventdata)plotProbeV2('probeAxes_ButtonDownFcn',hObject,eventdata,guidata(hObject));
 cla(fig)
 
 if isempty(rhoRange)||~handles.filterDistances.Value
@@ -669,3 +669,12 @@ function dispStims_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of dispStims
+
+
+% --- Executes on button press in checkbox9.
+function checkbox9_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox9
