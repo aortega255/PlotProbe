@@ -51,7 +51,7 @@ function plotProbeV2_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to plotProbeV2 (see VARARGIN)
-debugFlag=1;
+debugFlag=0;
 
 handles.debugFlag=debugFlag;
 if debugFlag
@@ -60,7 +60,7 @@ if debugFlag
     datos=conditionData('out_hrf.mat');
 else
     if ~isempty(varargin)
-        datos=varargin{1};
+        datos=conditionData(varargin{1});
     end
 end
 if exist('datos','var')
