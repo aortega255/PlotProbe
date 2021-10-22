@@ -278,6 +278,7 @@ function outputData=conditionData(inputData)
 %filename to load, or a data structure containing the desired variables. It
 %will be assumed that a string input is a filename, otherwise it will be a
 %structure
+%This should be able to read snirf files and not only mat files
 if ischar(inputData)
     %lload \DeltaOD and HRF OD
     %load(inputData,'','','','')
@@ -289,14 +290,15 @@ if ischar(inputData)
 else
     %assume structure
     %handles.DeltaOD=inputData.DeltaOD;
-    datos.timeSeries=inputData.data;
-    datos.averages=inputData.yavg;
-    datos.probe=inputData.probe;
-    datos.stims=inputData.stims;
+    datos=inputData;    
 end
 
-%preprocess stuff
+%do some data and variable validation. I basically need to find if the data
+%is TD fNIRS or regular. Also, find what fields are included so options can
+%be enabled in the GUI
 
+%preprocess stuff
+stims=datos.stims;
 tt=datos.timeSeries.time;
 datos.onsets=zeros(size(tt));  %stimulus onsets
 datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
@@ -305,6 +307,12 @@ for ki=1:size(stims.data,1)
     datos.onsets(sIdx(1))=1;
     datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
 end
+
+%maybe output a structure indicating what things will be enabled or
+%disabled based on the data available. Not sure if it's better to send the
+%handles structure to this function directly or make the function caller do
+%the GUI adaptation
+
 outputData=datos;
 
 
