@@ -298,15 +298,25 @@ end
 %be enabled in the GUI
 
 %preprocess stuff
-stims=datos.stims;
+stimClassNumber=length(stims);
+stims=cell(1,stimClassNumber);
 tt=datos.timeSeries.time;
-datos.onsets=zeros(size(tt));  %stimulus onsets
-datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
-for ki=1:size(stims.data,1)
-    sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));
-    datos.onsets(sIdx(1))=1;
-    datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
+%make stimulus time series
+for kii=1:stimClassNumber
+    onsets=zeros(size(tt));  %stimulus onsets
+    s1=zeros(4,size(datos.stims(kii).data,1)); %used for creating patches
+    for ki=1:size(datos.stims(kii).data,1)
+        sIdx=find(tt>=datos.stims.data(ki,1)&tt<=datos.stims.data(ki,1)+datos.stims.data(ki,2));
+        onsets(sIdx(1))=1;
+        s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
+    end      
+    stims{kii}.onsets=onsets;
+        stims{kii}.s1=s1;
 end
+datos.stims=stims;
+[ml,rho] = getMeasurementListArray(datos.timeSeries,datos.probe);
+datos.measurementList=ml;
+datos.rho=rho;
 
 %maybe output a structure indicating what things will be enabled or
 %disabled based on the data available. Not sure if it's better to send the
