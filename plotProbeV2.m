@@ -56,20 +56,8 @@ debugFlag=1;
 handles.debugFlag=debugFlag;
 if debugFlag
     %     Homer3Path='C:\Users\oanto\Documents\MATLAB\work\BU\Homer3tucker';
-    %     run([Homer3Path,filesep,'setpaths'])
-    load('out_hrf.mat','yavg','data','probe','stims')
-    datos.timeSeries=data;
-    datos.averages=yavg;
-    datos.probe=probe;
-    datos.stims=stims;
-    tt=datos.timeSeries.time;
-    datos.onsets=zeros(size(tt));  %stimulus onsets
-    datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
-    for ki=1:size(stims.data,1)
-        sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));        
-        datos.onsets(sIdx(1))=1;
-        datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
-    end
+    %     run([Homer3Path,filesep,'setpaths'])    
+    datos=conditionData('out_hrf.mat');
 else
     if ~isempty(varargin)
         datos=varargin{1};
@@ -267,19 +255,7 @@ function loadTag_Callback(hObject, eventdata, handles)
 % function called when loading the data
 fName=uigetfile;
 if ~isempty(fName)
-    load(fName,'yavg','data','probe','stims')
-    datos.timeSeries=data;
-    datos.averages=yavg;
-    datos.probe=probe;
-    datos.stims=stims;
-    tt=datos.timeSeries.time;
-    datos.onsets=zeros(size(tt));  %stimulus onsets
-    datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
-    for ki=1:size(stims.data,1)
-        sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));        
-        datos.onsets(sIdx(1))=1;
-        datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
-    end
+    datos=conditionData(fName);
     handles.data=datos;
     %if data is present, send to axis to plot
     if ~isempty(datos)
@@ -298,8 +274,39 @@ function mainFigure_CreateFcn(hObject, eventdata, handles)
 
 function outputData=conditionData(inputData)
 %this function will be used either to process the data received either from
-%the load function or as the passed argument
-outputData=inputData;
+%the load function or as the passed argument. It will either accept a
+%filename to load, or a data structure containing the desired variables. It
+%will be assumed that a string input is a filename, otherwise it will be a
+%structure
+if ischar(inputData)
+    %lload \DeltaOD and HRF OD
+    %load(inputData,'','','','')
+    load(inputData,'yavg','data','probe','stims')
+    datos.timeSeries=data;
+    datos.averages=yavg;
+    datos.probe=probe;
+    datos.stims=stims;
+else
+    %assume structure
+    %handles.DeltaOD=inputData.DeltaOD;
+    datos.timeSeries=inputData.data;
+    datos.averages=inputData.yavg;
+    datos.probe=inputData.probe;
+    datos.stims=inputData.stims;
+end
+
+%preprocess stuff
+
+tt=datos.timeSeries.time;
+datos.onsets=zeros(size(tt));  %stimulus onsets
+datos.s1=zeros(4,size(stims.data,1)); %used for creating patches
+for ki=1:size(stims.data,1)
+    sIdx=find(tt>=stims.data(ki,1)&tt<=stims.data(ki,1)+stims.data(ki,2));
+    datos.onsets(sIdx(1))=1;
+    datos.s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
+end
+outputData=datos;
+
 
 function plotData(hObject,handles)
 probe= handles.data.probe;
