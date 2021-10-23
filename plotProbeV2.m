@@ -100,38 +100,31 @@ function probeAxes_ButtonDownFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %handles.currentPoint = get(hObject,'CurrentPoint');
-
+stimIndex=1;  %<-change this to be a control reading from the available types of stims
 %Identify curve parameters
 chanNum=str2num(get(eventdata.Source,'Tag')); %#ok<ST2NM>
 wavelengthIndex=handles.data.timeSeries.measurementList(chanNum).wavelengthIndex;
-dataTypeIndex=handles.data.timeSeries.measurementList(chanNum).dataTypeIndex;
+dataType=handles.data.timeSeries.measurementList(chanNum).dataTypeLabel;
 sourceIndex=handles.data.timeSeries.measurementList(chanNum).sourceIndex;
 detectorIndex=handles.data.timeSeries.measurementList(chanNum).detectorIndex;
-rho=norm(handles.data.probe.sourcePos3D(sourceIndex,:)-handles.data.probe.detectorPos3D(detectorIndex,:));
-
-
-%figure out which time series I'm plotting
+rho=handles.data.rho(chanNum);
 
 %find the other related curves
-indice2=[1,0,2];
-currchanIdx=3*double(wavelengthIndex-1)+indice2(dataTypeIndex);
-firstChan=chanNum-currchanIdx;
-relatedChans=firstChan:firstChan+5;
+ml=handles.data.measurementList;
+relatedChannels=find(ml(:,1)==sourceIndex&ml(:,2)==detectorIndex);
 
+%figure out which time series I'm plotting
 activePlots=[handles.al1.Value||handles.al2.Value,...
     handles.ml1.Value||handles.ml2.Value,...
     handles.vl1.Value||handles.vl2.Value];
 indiPlots=find(activePlots==1);
 nsubplots=sum(activePlots);
 
-% check if the source and detector indices are consistent for all related
-% plots
-
 %define time series to plot
 t=handles.data.timeSeries.time;
 plotBuffer=nan(length(t),6);
 for ki=1:6
-    plotBuffer(:,ki)=handles.data.timeSeries.dataTimeSeries(:,relatedChans(ki));
+    plotBuffer(:,ki)=handles.data.timeSeries.dataTimeSeries(:,relatedChannels(ki));
 end
 
 %plot
@@ -154,10 +147,10 @@ switch handles.seriesSelector.SelectedObject.String
                             hold on
                         end
                         if handles.dispStims.Value
-                            plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
-                            Ys=[zeros(2,size(handles.data.s1,2))+offset;...
-                                scaling*ones(2,size(handles.data.s1,2))]; 
-                            patch(handles.data.s1,Ys,[1,.6,.6])
+                            plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
+                            Ys=[zeros(2,size(handles.data.stims{stimIndex}.s1,2))+offset;...
+                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))]; 
+                            patch(handles.data.stims{stimIndex}.s1,Ys,[1,.6,.6])
                         end
                         if handles.al2.Value
                             yyaxis right
@@ -176,10 +169,15 @@ switch handles.seriesSelector.SelectedObject.String
                             hold on
                         end
                         if handles.dispStims.Value
-                            plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
-                            Ys=[zeros(2,size(handles.data.s1,2))+offset;...
-                                scaling*ones(2,size(handles.data.s1,2))]; 
-                            surface1=patch(handles.data.s1,Ys,[1,.6,.6]);
+                            plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
+                            Ys=[zeros(2,size(handles.data.stims{stimIndex}.s1,2))+offset;...
+                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))]; 
+                            patch(handles.data.stims{stimIndex}.s1,Ys,[1,.6,.6])
+
+%                             plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
+%                             Ys=[zeros(2,size(handles.data.s1,2))+offset;...
+%                                 scaling*ones(2,size(handles.data.s1,2))]; 
+%                             surface1=patch(handles.data.s1,Ys,[1,.6,.6]);
                             %surface1.FaceVertexAlphaData=0.1;
                         end
                         hold off
@@ -200,10 +198,11 @@ switch handles.seriesSelector.SelectedObject.String
                             hold on
                         end
                         if handles.dispStims.Value
-                            plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
-                            Ys=[zeros(2,size(handles.data.s1,2))+offset;...
-                                scaling*ones(2,size(handles.data.s1,2))]; 
-                            patch(handles.data.s1,Ys,[1,.6,.6])
+                                                      plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
+                            Ys=[zeros(2,size(handles.data.stims{stimIndex}.s1,2))+offset;...
+                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))]; 
+                            patch(handles.data.stims{stimIndex}.s1,Ys,[1,.6,.6])
+
                         end
                         hold off
                         if handles.vl2.Value
@@ -327,6 +326,7 @@ outputData=datos;
 
 
 function plotData(hObject,handles)
+%data types at https://github.com/fNIRS/snirf/blob/master/snirf_specification.md
 probe= handles.data.probe;
 yavg=handles.data.averages;
 rhoRange=[str2double(handles.loLimrho.String) str2double(handles.hiLimrho.String)];
