@@ -271,7 +271,7 @@ function mainFigure_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-function outputData=conditionData(inputData)
+function [outputData,params]=conditionData(inputData)
 %this function will be used either to process the data received either from
 %the load function or as the passed argument. It will either accept a
 %filename to load, or a data structure containing the desired variables. It
@@ -311,16 +311,19 @@ for kii=1:stimClassNumber
     end      
     stims{kii}.onsets=onsets;
         stims{kii}.s1=s1;
+        stims{kii}.name=datos.stims(kii).name;
 end
 datos.stims=stims;
 [ml,rho] = getMeasurementListArray(datos.timeSeries,datos.probe);
 datos.measurementList=ml;
 datos.rho=rho;
 
-%maybe output a structure indicating what things will be enabled or
+%output a structure indicating what things will be enabled or
 %disabled based on the data available. Not sure if it's better to send the
 %handles structure to this function directly or make the function caller do
 %the GUI adaptation
+params.stims.number=stimClassNumber;
+params.stims.names=stims.name;
 
 outputData=datos;
 
