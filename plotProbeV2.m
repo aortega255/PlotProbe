@@ -60,7 +60,7 @@ if debugFlag
     datos=conditionData('out_hrf.mat');
 else
     if ~isempty(varargin)
-        datos=conditionData(varargin{1});
+        datos=conditionData(varargin);
     end
 end
 if exist('datos','var')
@@ -249,7 +249,7 @@ function loadTag_Callback(hObject, eventdata, handles)
 % function called when loading the data
 fName=uigetfile;
 if ~isempty(fName)
-    datos=conditionData(fName);
+    datos=conditionData({fName});
     handles.data=datos;
     %if data is present, send to axis to plot
     if ~isempty(datos)
@@ -273,26 +273,58 @@ function [outputData,params]=conditionData(inputData)
 %will be assumed that a string input is a filename, otherwise it will be a
 %structure
 %This should be able to read snirf files and not only mat files
-if ischar(inputData)
-    %lload \DeltaOD and HRF OD
-    %load(inputData,'','','','')
-    load(inputData,'yavg','data','probe','stims')
+if length(inputData)==1 %assumes it's a file name
+    load(inputData{1},'yavg','data','probe','stims')
     datos.timeSeries=data;
     datos.averages=yavg;
     datos.probe=probe;
     datos.stims=stims;
-else
-    %assume structure
-    %handles.DeltaOD=inputData.DeltaOD;
-    datos=inputData;
+elseif length(inputData)>1 %assumes it's a varargin argument
+    %however, said varargin argument should have up to 7 entries; non
+    %provided arguments should be []
+    %[probe,stim,HRFdod,HRFconc,dod,conc,Intensity]
+    %dod is implicitly permitted to be delta of a moment of higher order;
+    %Intensity is implicitly permitted to be a moment of higher order
+    datos.probe=inputData{1};
+    datos.stims=inputData{2};
+    flagConc=0;
+    flagDod=0;
+    try
+        datos.averages=inputData{3};                
+        flagDod=1; %flag indicating what type of data was loaded
+    catch
+        datos.averages=inputData{4};
+        flagConc=1;
+    end
+    %for now ignore HRF in conc space if it's present in dod space; at some
+    %point it should do different things if we provide both
+    flagTimeSeries=0;  %if this is zero, disable clicking on curves
+    if flagDod
+        try
+            datos.timeSeries=inputData{5};
+            flagTimeSeries=1;
+        end
+    elseif flagConc%for now, assume only one or the other is active
+        try
+            datos.timeSeries=inputData{6};
+            flagTimeSeries=1;
+        end
+    else
+        %if neither is present,try to use intensity data
+        try
+            datos.timeSeries=inputData{7};
+            flagTimeSeries=1;
+        end
+    end            
 end
+
 
 %do some data and variable validation. I basically need to find if the data
 %is TD fNIRS or regular. Also, find what fields are included so options can
 %be enabled in the GUI
 
 %preprocess stuff
-stimClassNumber=length(stims);
+stimClassNumber=length(datos.stims);
 stims=cell(1,stimClassNumber);
 stimNames=cell(1,stimClassNumber);
 tt=datos.timeSeries.time;
