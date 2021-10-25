@@ -299,6 +299,7 @@ end
 %preprocess stuff
 stimClassNumber=length(stims);
 stims=cell(1,stimClassNumber);
+stimNames=cell(1,stimClassNumber);
 tt=datos.timeSeries.time;
 %make stimulus time series
 for kii=1:stimClassNumber
@@ -312,6 +313,7 @@ for kii=1:stimClassNumber
     stims{kii}.onsets=onsets;
         stims{kii}.s1=s1;
         stims{kii}.name=datos.stims(kii).name;
+        stimNames{kii}=datos.stims(kii).name;
 end
 datos.stims=stims;
 [ml,rho] = getMeasurementListArray(datos.timeSeries,datos.probe);
@@ -323,7 +325,7 @@ datos.rho=rho;
 %handles structure to this function directly or make the function caller do
 %the GUI adaptation
 params.stims.number=stimClassNumber;
-params.stims.names=stims.name;
+params.stims.names=stimNames;
 
 outputData=datos;
 
