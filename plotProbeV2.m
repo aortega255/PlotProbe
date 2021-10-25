@@ -56,7 +56,7 @@ debugFlag=0;
 handles.debugFlag=debugFlag;
 if debugFlag
     %     Homer3Path='C:\Users\oanto\Documents\MATLAB\work\BU\Homer3tucker';
-    %     run([Homer3Path,filesep,'setpaths'])    
+    %     run([Homer3Path,filesep,'setpaths'])
     datos=conditionData('out_hrf.mat');
 else
     if ~isempty(varargin)
@@ -102,16 +102,19 @@ function probeAxes_ButtonDownFcn(hObject, eventdata, handles)
 %handles.currentPoint = get(hObject,'CurrentPoint');
 stimIndex=1;  %<-change this to be a control reading from the available types of stims
 %Identify curve parameters
-chanNum=str2num(get(eventdata.Source,'Tag')); %#ok<ST2NM>
-wavelengthIndex=handles.data.timeSeries.measurementList(chanNum).wavelengthIndex;
-dataType=handles.data.timeSeries.measurementList(chanNum).dataTypeLabel;
-sourceIndex=handles.data.timeSeries.measurementList(chanNum).sourceIndex;
-detectorIndex=handles.data.timeSeries.measurementList(chanNum).detectorIndex;
-rho=handles.data.rho(chanNum);
+HRFNum=str2num(get(eventdata.Source,'Tag')); %#ok<ST2NM>
+wavelengthIndex=handles.data.averages.measurementList(HRFNum).wavelengthIndex;
+dataTypeLabel=handles.data.averages.measurementList(HRFNum).dataTypeLabel;
+dataType=handles.data.averages.measurementList(HRFNum).dataType;
+dataTypeIndex=handles.data.averages.measurementList(HRFNum).dataTypeIndex;
+sourceIndex=handles.data.averages.measurementList(HRFNum).sourceIndex;
+detectorIndex=handles.data.averages.measurementList(HRFNum).detectorIndex;
+rho=handles.data.rhoHRF(HRFNum);
 
 %find the other related curves
 ml=handles.data.measurementList;
-relatedChannels=find(ml(:,1)==sourceIndex&ml(:,2)==detectorIndex);
+relatedChannels=find(ml(:,1)==sourceIndex&ml(:,2)==detectorIndex); %thes are all same source and detector and thus same rho; indexed to the time series
+
 
 %figure out which time series I'm plotting
 activePlots=[handles.al1.Value||handles.al2.Value,...
@@ -122,10 +125,8 @@ nsubplots=sum(activePlots);
 
 %define time series to plot
 t=handles.data.timeSeries.time;
-plotBuffer=nan(length(t),6);
-for ki=1:6
-    plotBuffer(:,ki)=handles.data.timeSeries.dataTimeSeries(:,relatedChannels(ki));
-end
+plotBuffer=handles.data.timeSeries.dataTimeSeries(:,relatedChannels);
+
 
 %plot
 figure
@@ -149,7 +150,7 @@ switch handles.seriesSelector.SelectedObject.String
                         if handles.dispStims.Value
                             plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
                             Ys=[zeros(2,size(handles.data.stims{stimIndex}.s1,2))+offset;...
-                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))]; 
+                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))];
                             patch(handles.data.stims{stimIndex}.s1,Ys,[1,.6,.6])
                         end
                         if handles.al2.Value
@@ -171,14 +172,8 @@ switch handles.seriesSelector.SelectedObject.String
                         if handles.dispStims.Value
                             plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
                             Ys=[zeros(2,size(handles.data.stims{stimIndex}.s1,2))+offset;...
-                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))]; 
+                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))];
                             patch(handles.data.stims{stimIndex}.s1,Ys,[1,.6,.6])
-
-%                             plot(t,handles.data.onsets*(scaling-offset)+offset,'-k')
-%                             Ys=[zeros(2,size(handles.data.s1,2))+offset;...
-%                                 scaling*ones(2,size(handles.data.s1,2))]; 
-%                             surface1=patch(handles.data.s1,Ys,[1,.6,.6]);
-                            %surface1.FaceVertexAlphaData=0.1;
                         end
                         hold off
                         if handles.ml2.Value
@@ -198,11 +193,11 @@ switch handles.seriesSelector.SelectedObject.String
                             hold on
                         end
                         if handles.dispStims.Value
-                                                      plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
+                            plot(t,handles.data.stims{stimIndex}.onsets*(scaling-offset)+offset,'-k')
                             Ys=[zeros(2,size(handles.data.stims{stimIndex}.s1,2))+offset;...
-                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))]; 
+                                scaling*ones(2,size(handles.data.stims{stimIndex}.s1,2))];
                             patch(handles.data.stims{stimIndex}.s1,Ys,[1,.6,.6])
-
+                            
                         end
                         hold off
                         if handles.vl2.Value
@@ -217,7 +212,7 @@ switch handles.seriesSelector.SelectedObject.String
                 '. (',' \rho=',num2str(rho),')']);
             xlabel('Time [s]')
         else
-            plot(t,handles.data.timeSeries.dataTimeSeries(:,chanNum))
+            plot(t,handles.data.timeSeries.dataTimeSeries(:,HRFNum))
             xlabel('Time [s]')
             ytags={'Intensity','m1','V'};
             ylabel([ytags{handles.data.probe.momentOrders(dataTypeIndex)+1},...
@@ -228,9 +223,9 @@ switch handles.seriesSelector.SelectedObject.String
                 '.']);
         end
     case 'Hb time series'
-
+        
     case 'HRF'
-
+        
 end
 
 
@@ -289,7 +284,7 @@ if ischar(inputData)
 else
     %assume structure
     %handles.DeltaOD=inputData.DeltaOD;
-    datos=inputData;    
+    datos=inputData;
 end
 
 %do some data and variable validation. I basically need to find if the data
@@ -309,16 +304,18 @@ for kii=1:stimClassNumber
         sIdx=find(tt>=datos.stims.data(ki,1)&tt<=datos.stims.data(ki,1)+datos.stims.data(ki,2));
         onsets(sIdx(1))=1;
         s1(:,ki)=[tt(sIdx(1));tt(sIdx(end));tt(sIdx(end));tt(sIdx(1))];
-    end      
+    end
     stims{kii}.onsets=onsets;
-        stims{kii}.s1=s1;
-        stims{kii}.name=datos.stims(kii).name;
-        stimNames{kii}=datos.stims(kii).name;
+    stims{kii}.s1=s1;
+    stims{kii}.name=datos.stims(kii).name;
+    stimNames{kii}=datos.stims(kii).name;
 end
 datos.stims=stims;
 [ml,rho] = getMeasurementListArray(datos.timeSeries,datos.probe);
 datos.measurementList=ml;
-datos.rho=rho;
+[ml,rho] = getMeasurementListArray(datos.averages,datos.probe);
+datos.measurementListHRF=ml;
+datos.rhoHRF=rho;
 
 %output a structure indicating what things will be enabled or
 %disabled based on the data available. Not sure if it's better to send the
@@ -370,16 +367,16 @@ for iM = 1:nMeas
     mlHRF(iM,1) = measurementList(iM).sourceIndex;
     mlHRF(iM,2) = measurementList(iM).detectorIndex;
     mlHRF(iM,4) = measurementList(iM).wavelengthIndex;
-
+    
     switch measurementList(iM).dataTypeLabel
-
+        
         case 'HRF HbO'
             mlHRF(iM,3) = 1;
         case 'HRF HbR'
             mlHRF(iM,3) = 2;
         case 'HRF HbT'
             mlHRF(iM,3) = 3;
-
+            
         case 'HRF dOD'
             mlHRF(iM,3) = 1;
         case 'HRF dMTF'
@@ -387,11 +384,11 @@ for iM = 1:nMeas
         case 'HRF dVar'
             mlHRF(iM,3) = 3;
     end
-
+    
     ps = probe.sourcePos3D( mlHRF(iM,1), : );
     pd = probe.detectorPos3D( mlHRF(iM,2), : );
     rhoHRF(iM) = norm( ps-pd);
-
+    
     pCH(iM,:) = (probe.sourcePos2D( mlHRF(iM,1), 1:2 ) + probe.detectorPos2D( mlHRF(iM,2), 1:2 )) / 2;
 end
 
@@ -458,7 +455,7 @@ if 0
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
         set(h,'Tag',num2str(lstKeep3(iM)));
     end
-
+    
 else
     minyy = min(min(d1a));
     maxyy = max(max(d1a));
@@ -468,7 +465,7 @@ else
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
         set(h,'Tag',num2str(lstKeep1a(iM)));
     end
-
+    
     minyy = min(min(d1b));
     maxyy = max(max(d1b));
     yy1 = ((d1b) / (maxyy-minyy)) * 0.05;
@@ -477,7 +474,7 @@ else
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
         set(h,'Tag',num2str(lstKeep1b(iM)));
     end
-
+    
     minyy = min(min(d2a));
     maxyy = max(max(d2a));
     yy1 = ((d2a) / (maxyy-minyy)) * 0.05;
@@ -486,7 +483,7 @@ else
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
         set(h,'Tag',num2str(lstKeep2a(iM)));
     end
-
+    
     minyy = min(min(d2b));
     maxyy = max(max(d2b));
     yy1 = ((d2b) / (maxyy-minyy)) * 0.05;
@@ -495,7 +492,7 @@ else
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
         set(h,'Tag',num2str(lstKeep2b(iM)));
     end
-
+    
     minyy = min(min(d3a));
     maxyy = max(max(d3a));
     yy1 = ((d3a) / (maxyy-minyy)) * 0.05;
@@ -504,7 +501,7 @@ else
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
         set(h,'Tag',num2str(lstKeep3a(iM)));
     end
-
+    
     minyy = min(min(d3b));
     maxyy = max(max(d3b));
     yy1 = ((d3b) / (maxyy-minyy)) * 0.05;
