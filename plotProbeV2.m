@@ -247,9 +247,9 @@ function loadTag_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % function called when loading the data
-fName=uigetfile;
+[fName,path]=uigetfile;
 if ~isempty(fName)
-    datos=conditionData({fName});
+    datos=conditionData({[path,fName]});
     handles.data=datos;
     %if data is present, send to axis to plot
     if ~isempty(datos)
