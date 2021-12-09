@@ -22,7 +22,7 @@ function varargout = plotProbeV2(varargin)
 
 % Edit the above text to modify the response to help plotProbeV2
 
-% Last Modified by GUIDE v2.5 18-Oct-2021 10:47:09
+% Last Modified by GUIDE v2.5 07-Dec-2021 13:26:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -249,6 +249,7 @@ function loadTag_Callback(hObject, eventdata, handles)
 % function called when loading the data
 [fName,path]=uigetfile;
 if ~isempty(fName)
+    handles.mainFigure.Name = ['plotProbeV2 - ',fName];
     datos=conditionData({[path,fName]});
     handles.data=datos;
     %if data is present, send to axis to plot
@@ -469,9 +470,9 @@ yy(:,:,3) = dAvg(:,lstKeep3);
 if 0
     minyy = min(yy(:));
     maxyy = max(yy(:));
-    yy1 = ((yy(:,:,1)) / (maxyy-minyy)) * 0.05;
-    yy2 = ((yy(:,:,2)) / (maxyy-minyy)) * 0.05;
-    yy3 = ((yy(:,:,3)) / (maxyy-minyy)) * 0.05;
+    yy1 = ((yy(:,:,1)) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
+    yy2 = ((yy(:,:,2)) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
+    yy3 = ((yy(:,:,3)) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep1)
         h=plot(ax, xx+pCH(lstKeep1(iM),1), yy1(:,iM)+pCH(lstKeep1(iM),2), 'r-');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -491,7 +492,7 @@ if 0
 else
     minyy = min(min(d1a));
     maxyy = max(max(d1a));
-    yy1 = ((d1a) / (maxyy-minyy)) * 0.05;
+    yy1 = ((d1a) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep1a)
         h=plot(ax, xx+pCH(lstKeep1a(iM),1), yy1(:,iM)+pCH(lstKeep1a(iM),2), 'r-.');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -500,7 +501,7 @@ else
     
     minyy = min(min(d1b));
     maxyy = max(max(d1b));
-    yy1 = ((d1b) / (maxyy-minyy)) * 0.05;
+    yy1 = ((d1b) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep1b)
         h=plot(ax, xx+pCH(lstKeep1b(iM),1), yy1(:,iM)+pCH(lstKeep1b(iM),2), 'r-');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -509,7 +510,7 @@ else
     
     minyy = min(min(d2a));
     maxyy = max(max(d2a));
-    yy1 = ((d2a) / (maxyy-minyy)) * 0.05;
+    yy1 = ((d2a) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep2a)
         h=plot(ax, xx+pCH(lstKeep2a(iM),1), yy1(:,iM)+pCH(lstKeep2a(iM),2), 'b-.');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -518,7 +519,7 @@ else
     
     minyy = min(min(d2b));
     maxyy = max(max(d2b));
-    yy1 = ((d2b) / (maxyy-minyy)) * 0.05;
+    yy1 = ((d2b) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep2b)
         h=plot(ax, xx+pCH(lstKeep2b(iM),1), yy1(:,iM)+pCH(lstKeep2b(iM),2), 'b-');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -527,7 +528,7 @@ else
     
     minyy = min(min(d3a));
     maxyy = max(max(d3a));
-    yy1 = ((d3a) / (maxyy-minyy)) * 0.05;
+    yy1 = ((d3a) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep3a)
         h=plot(ax, xx+pCH(lstKeep3a(iM),1), yy1(:,iM)+pCH(lstKeep3a(iM),2), 'c-.');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -536,7 +537,7 @@ else
     
     minyy = min(min(d3b));
     maxyy = max(max(d3b));
-    yy1 = ((d3b) / (maxyy-minyy)) * 0.05;
+    yy1 = ((d3b) / (maxyy-minyy)) * 0.05 * str2double(handles.edit3.String);
     for iM = 1:length(lstKeep3b)
         h=plot(ax, xx+pCH(lstKeep3b(iM),1), yy1(:,iM)+pCH(lstKeep3b(iM),2), 'c-');
         set(h,'ButtonDownFcn',buttonPressFuncHandle);
@@ -742,3 +743,29 @@ function checkbox9_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox9
+
+
+
+function edit3_Callback(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit3 as text
+%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+
+%plot data with the new scale
+plotData(hObject,handles)
+
+
+% --- Executes during object creation, after setting all properties.
+function edit3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
